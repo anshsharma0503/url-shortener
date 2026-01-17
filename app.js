@@ -9,10 +9,9 @@ connectDb();
 
 app.use(express.json());
 
-app.get("/" , (req , res) => {
-    res.send("URL shortener API is running");
-});
-
+const urlRoutes = require("./routes/urlRoutes");
+app.use("/" , urlRoutes);
+ 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`);
