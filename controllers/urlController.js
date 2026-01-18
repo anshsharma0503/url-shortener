@@ -1,39 +1,36 @@
+const Url = require("../models/Url");
+
 function generateShortCode(length = 6) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let code = "";
 
-    let code = "";
+  for (let i = 0; i < length; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
 
-    for(let i =0 ; i < length ; i++){
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-
-    return code;
+  return code;
 }
 
-const  url = require("../models/URL");
+const shortenUrl = async (req, res) => {
+  try {
+    const { longUrl } = req.body;
 
-const shortenUrl = async(req , res) =>{
-    try{
-        const { longUrl } = req.body;
-        const shortCode = generateShortCode();
-        
-        const newUrl = new url({
-            longUrl ,
-            shortCode,
-        });
+    const shortCode = generateShortCode();
 
-        await newUrl.save();
+    const newUrl = new Url({
+      longUrl,
+      shortCode,
+    });
 
-        const shortUrl = `${req.protocol}://${req.get("host")}/${shortCode}`;
+    await newUrl.save();
 
-        res.status(201).json({ shortUrl });
+    const shortUrl = `${req.protocol}://${req.get("host")}/${shortCode}`;
 
-    } catch (error) {
-        res.status(500).json({message: "server error"});
-    }
+    res.status(201).json({ shortUrl });
+  } catch (error) {
+    console.error("SHORTEN ERROR:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
-  };
-
-  module.exports ={
-    shortenUrl,
-  };
+module.exports = { shortenUrl };
